@@ -1,0 +1,13 @@
+[project]
+name = "hf-onnx"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "huggingface-hub>=1.2.3",
+    "numpy>=2.3.5",
+    "onnxruntime>=1.23.2",
+    "pillow>=12.0.0",
+    "tokenizers>=0.22.1",
+]
