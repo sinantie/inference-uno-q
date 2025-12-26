@@ -1,13 +1,16 @@
 [project]
-name = "hf-onnx"
+name = "inference-uno-q"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "huggingface-hub>=1.2.3",
-    "numpy>=2.3.5",
-    "onnxruntime>=1.23.2",
-    "pillow>=12.0.0",
-    "tokenizers>=0.22.1",
+ "huggingface-hub>=0.36.0",
+ "jinja2>=3.1.6",
+ "llama-cpp-python>=0.3.16",
+ "numpy>=2.3.5",
+ "onnxruntime>=1.23.2",
+ "pillow>=12.0.0",
+ "torch>=2.9.1",
+ "transformers>=4.57.3",
 ]
