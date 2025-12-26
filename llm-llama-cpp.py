@@ -2,9 +2,6 @@
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 import os
-
-os.environ["LLAMA_CPP_LOG_LEVEL"] = "ERROR"
-import os
 os.environ["LLAMA_CPP_LOG_LEVEL"] = "ERROR"
 # Pick a GGUF file from an HF repo (example below)
 repo = "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF"
