@@ -15,20 +15,31 @@ import base64
 from pathlib import Path
 import argparse
 import sys
+from PIL import Image
+from io import BytesIO
 
-def encode_image_to_base64(image_path):
+def encode_image_to_base64(image_path, resize=False):
     """Encode an image file to base64 string."""
     if not Path(image_path).exists():
         raise FileNotFoundError(f"Image file not found: {image_path}")
 
     with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
+        img = Image.open(image_file).convert("RGB")
+        if resize:
+            print("Resizing image to 256x256")
+            img = img.resize((256, 256))  # match model spec
+        
+        # Save image to bytes
+        buffer = BytesIO()
+        img.save(buffer, format="JPEG")
+        img_bytes = buffer.getvalue()
+        return base64.b64encode(img_bytes).decode('utf-8')
 
-def chat_with_image(image_path, prompt, max_tokens=32, server_url="http://localhost:8080"):
+def chat_with_image(image_path, prompt, max_tokens=32, resize=False, server_url="http://localhost:8080"):
     """Send a chat completion request with an image to the llama.cpp server."""
 
     # Encode the image
-    base64_image = encode_image_to_base64(image_path)
+    base64_image = encode_image_to_base64(image_path, resize=resize)
 
     # Prepare the request payload
     payload = {
@@ -71,6 +82,8 @@ def chat_with_image(image_path, prompt, max_tokens=32, server_url="http://localh
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chat with SmolVLM using images")
     parser.add_argument("image_path", help="Path to the image file")
+    parser.add_argument("-r", "--resize", action="store_true",
+                       help="Resize image to 256x256 before processing (default: False)")
     parser.add_argument("-p", "--prompt", default="Describe this image in detail",
                        help="Text prompt to send with the image (default: 'Describe this image in detail')")
     parser.add_argument("-m", "--max-tokens", type=int, default=512,
