@@ -15,8 +15,31 @@ import base64
 from pathlib import Path
 import argparse
 import sys
-from PIL import Image
+from PIL import Image, ImageOps
 from io import BytesIO
+
+
+def image_to_data_uri(path, size=(256, 256), quality=80):
+    # Load and auto-orient
+    img = Image.open(path)
+    img = ImageOps.exif_transpose(img).convert("RGB")
+
+    # Resize (preserve aspect ratio, then crop to exact size)
+    img.thumbnail(size, Image.LANCZOS)
+    if img.size != size:
+        w, h = img.size
+        tw, th = size
+        left = max(0, (w - tw) // 2)
+        top = max(0, (h - th) // 2)
+        img = img.crop((left, top, left + tw, top + th))
+
+    # Compress to JPEG in memory
+    buf = BytesIO()
+    img.save(buf, format="JPEG", quality=quality, optimize=True)
+    buf.seek(0)
+
+    return base64.b64encode(buf.read()).decode('utf-8')
+
 
 def encode_image_to_base64(image_path, resize=False):
     """Encode an image file to base64 string."""
@@ -39,7 +62,8 @@ def chat_with_image(image_path, prompt, max_tokens=32, resize=False, server_url=
     """Send a chat completion request with an image to the llama.cpp server."""
 
     # Encode the image
-    base64_image = encode_image_to_base64(image_path, resize=resize)
+    # base64_image = encode_image_to_base64(image_path, resize=resize)
+    base64_image = image_to_data_uri(image_path, size=(256, 256), quality=80)
 
     # Prepare the request payload
     payload = {
